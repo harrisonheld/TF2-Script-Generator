@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Configuration;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-namespace TF2SpamScriptGen
+namespace TF2ScriptGen
 {
     static class Program
     {
-        const int defaultWaitTime = 200; //in case there are non-numeric characters in waitTime
+        // use this wait time if the one the user enters isn't valid
+        // (for instance, if it contains a letter instead of a number)
+        const int DEFAULT_WAIT_TIME = 200;
 
         static string scriptsFolder;
         static string keyToBind;
@@ -47,8 +49,8 @@ namespace TF2SpamScriptGen
             }
             catch
             {
-                waitTimeInput.Value = defaultWaitTime;
-                waitTime = defaultWaitTime.ToString();
+                waitTimeInput.Value = DEFAULT_WAIT_TIME;
+                waitTime = DEFAULT_WAIT_TIME.ToString();
             }
 
             scriptsFolderTextBox.Text = scriptsFolder;
@@ -64,6 +66,7 @@ namespace TF2SpamScriptGen
         }
         static void OnLinesInputTextBoxKeyDown(object sender, KeyEventArgs e)
         {
+            // allow the use of ctrl-A to select all, which usually isn't possible
             if(e.Modifiers.HasFlag(Keys.Control) && e.KeyCode == Keys.A)
             {
                 e.SuppressKeyPress = true;
@@ -107,6 +110,7 @@ namespace TF2SpamScriptGen
         static void OnLoadButtonClick(object sender, EventArgs e)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = scriptsFolder;
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -158,14 +162,15 @@ namespace TF2SpamScriptGen
         {
             string[] scriptLines = File.ReadAllLines(scriptFilePath);
 
+            // modify the script line count to get the line count of the plain text.
             int lineCount = scriptLines.Length - 2;
             lineCount = (int)((float)lineCount * (5f / 6f)); 
-            //^^this literally CANNOT be a good way to do this but it works
 
             string[] lines = new string[lineCount];
 
             for(int i = 0; i < lineCount; i++)
             {
+                // turn from a script line back to just the plain text
                 lines[i] = scriptLines[i + 2].Split('"')[1].Remove(0, 4);
             }
             return lines;
