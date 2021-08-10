@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-namespace TF2ScriptGen
+namespace TF2SpamScriptGen
 {
     static class Program
     {
@@ -74,7 +74,7 @@ namespace TF2ScriptGen
 
         static void OnLinesInputTextBoxKeyDown(object sender, KeyEventArgs e)
         {
-            // allow the use of ctrl-A to select all, which usually possible by default
+            // allow the use of ctrl+A to select all, which isn't usually possible by default
             if(e.Modifiers.HasFlag(Keys.Control) && e.KeyCode == Keys.A)
             {
                 e.SuppressKeyPress = true;
@@ -181,14 +181,14 @@ namespace TF2ScriptGen
 
             // modify the script line count to get the line count of the plain text.
             int lineCount = scriptLines.Length - 2;
-            lineCount = (int)((float)lineCount * (5f / 6f)); 
+            lineCount = (int)((float)lineCount * (5f / 6f)) + 1; 
 
             string[] lines = new string[lineCount];
 
             for(int i = 0; i < lineCount; i++)
             {
                 // turn from a script line back to just the plain text
-                lines[i] = scriptLines[i + 2].Split('"')[1].Remove(0, 4);
+                lines[i] = scriptLines[i + 1].Split('"')[1].Remove(0, 4);
             }
             return lines;
         }
