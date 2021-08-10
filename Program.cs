@@ -12,10 +12,12 @@ namespace TF2ScriptGen
         // (for instance, if it contains a letter instead of a number)
         const int DEFAULT_WAIT_TIME = 200;
 
+        // settings for generated script
         static string scriptsFolder;
         static string keyToBind;
         static string waitTime;
 
+        // form elements
         static TextBox linesInputTextBox;
         static TextBox scriptsFolderTextBox;
         static Button scriptsFolderButton;
@@ -28,6 +30,7 @@ namespace TF2ScriptGen
         [STAThread]
         static void Main(string[] args)
         {
+            // set settings
             scriptsFolder = ConfigurationManager.AppSettings.Get("scriptsFolder");
             keyToBind = ConfigurationManager.AppSettings.Get("keyToBind");
             waitTime = ConfigurationManager.AppSettings.Get("waitTime");
@@ -43,6 +46,7 @@ namespace TF2ScriptGen
             saveSettingsButton = (Button)form1.Controls.Find("saveSettingsButton", false)[0];
             loadButton = (Button)form1.Controls.Find("loadButton", false)[0];
 
+            // set wait time box value
             try
             {
                 waitTimeInput.Value = int.Parse(waitTime);
@@ -53,28 +57,35 @@ namespace TF2ScriptGen
                 waitTime = DEFAULT_WAIT_TIME.ToString();
             }
 
+            // set other input boxes text
             scriptsFolderTextBox.Text = scriptsFolder;
             keyToBindTextBox.Text = keyToBind;
 
+            // add events
             scriptsFolderButton.Click += new EventHandler(OnScriptsFolderButtonClick);
             generateButton.Click += new EventHandler(OnGenerateButtonClick);
             saveSettingsButton.Click += new EventHandler(OnSaveSettingsButtonClick);
             loadButton.Click += new EventHandler(OnLoadButtonClick);
             linesInputTextBox.KeyDown += new KeyEventHandler(OnLinesInputTextBoxKeyDown);
 
+            // run form
             Application.Run(form1);
         }
+
         static void OnLinesInputTextBoxKeyDown(object sender, KeyEventArgs e)
         {
-            // allow the use of ctrl-A to select all, which usually isn't possible
+            // allow the use of ctrl-A to select all, which usually possible by default
             if(e.Modifiers.HasFlag(Keys.Control) && e.KeyCode == Keys.A)
             {
                 e.SuppressKeyPress = true;
                 linesInputTextBox.SelectAll();
             }
         }
+
         static void OnScriptsFolderButtonClick(object sender, EventArgs e)
         {
+            // change script folder
+
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
             dialog.InitialDirectory = scriptsFolder;
             dialog.IsFolderPicker = true;
@@ -85,6 +96,7 @@ namespace TF2ScriptGen
                 scriptsFolderTextBox.Text = dialog.FileName;
             }
         }
+
         static void OnSaveSettingsButtonClick(object sender, EventArgs e)
         {
             UpdateSettingsVars();
@@ -92,6 +104,7 @@ namespace TF2ScriptGen
             ConfigurationManager.AppSettings.Set("keyToBind", keyToBind);
             ConfigurationManager.AppSettings.Set("waitTime", waitTime);
         }
+
         static void OnGenerateButtonClick(object sender, EventArgs e)
         {
             CommonSaveFileDialog dialog = new CommonSaveFileDialog();
@@ -107,6 +120,7 @@ namespace TF2ScriptGen
                 File.WriteAllLines(dialog.FileName, scriptLines);
             }
         }
+
         static void OnLoadButtonClick(object sender, EventArgs e)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
@@ -117,12 +131,14 @@ namespace TF2ScriptGen
                 linesInputTextBox.Lines = GetInputFromScript(dialog.FileName);
             }
         }
+
         static void UpdateSettingsVars()
         {
             scriptsFolder = scriptsFolderTextBox.Text;
             keyToBind = keyToBindTextBox.Text;
             waitTime = waitTimeInput.Value.ToString();
         }
+
         static string[] GenerateScriptLines(string[] lines)
         {
             int setLineCount;
@@ -158,6 +174,7 @@ namespace TF2ScriptGen
             }
             return scriptLines;
         }
+
         static string[] GetInputFromScript(string scriptFilePath)
         {
             string[] scriptLines = File.ReadAllLines(scriptFilePath);
